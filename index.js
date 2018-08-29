@@ -2,7 +2,7 @@ const { ApolloServer, gql } = require('apollo-server');
 const { ProductTypes, OrderTypes, OrderInputTypes, CouponType, CustomerType } = require('./Types');
 const { Mutation, Query } = require('./resolvers');
 const { getUser } = require('./util/functions');
-const { pubsub, actions } = require('./pubsub');
+const { pubsub } = require('./pubsub');
 
 const typeDefs = gql`
   type Subscription {
@@ -38,6 +38,7 @@ const typeDefs = gql`
     createNewCustomer(customer: CustomerInput): Customer
     cancelCustomerOrder(order_id: Int): Boolean
   }
+
   ${CustomerType}
   ${CouponType}
   ${OrderTypes}
@@ -50,7 +51,8 @@ const resolvers = {
   Query,
   Subscription: {
     orderPlaced: {
-      subscribe: () => pubsub.asyncIterator([actions.ORDER_PLACED]),
+      resolve: (payload) => payload.orderPlaced,
+      subscribe: () => pubsub.asyncIterator('ORDER_PLACED')
     },
   }
 };
@@ -58,11 +60,24 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({req}) => {
-    const token = req.headers.authorization || '';
-    const user_id = getUser(token);
-    return { token, user_id };
-  }
+  context: async ({req, connection}) => {
+    if(connection) {
+      return { }
+    }else{
+      const token = req.headers.authorization || '';
+      if(token){
+        const user_id = getUser(token);
+        return { token, user_id };
+      }else{
+        return { }
+      }
+    }
+  },
+  playground: {
+    settings: {
+      'editor.theme': 'light',
+    },
+  },
 });
 
 server.listen().then(({ url }) => {

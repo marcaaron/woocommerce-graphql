@@ -5,7 +5,7 @@ module.exports = {
   createPaidOrder: async (root, { order }, context, info) => {
     try {
       const placedOrder = await wcPost(`orders`, order);
-      pubsub.publish(actions.ORDER_PLACED, { orderPlaced: order });
+      pubsub.publish('ORDER_PLACED', { orderPlaced: order });
       return placedOrder;
     }catch(e){
       console.log(e);
