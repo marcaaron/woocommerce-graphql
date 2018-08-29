@@ -6,7 +6,12 @@ module.exports = `
     billing: BillingInput
     shipping: ShippingInput
     line_items: [LineItemInput]
+    coupon_lines: [CouponInput]
     shipping_lines: [ShippingLineInput]
+  }
+
+  input CouponInput {
+    code: String
   }
 
   input ShippingLineInput {
@@ -24,6 +29,7 @@ module.exports = `
   input BillingInput {
     first_name: String
     last_name: String
+    company: String
     address_1: String
     address_2: String
     city: String
@@ -37,6 +43,7 @@ module.exports = `
   input ShippingInput {
     first_name: String
     last_name: String
+    company: String
     address_1: String
     address_2: String
     city: String

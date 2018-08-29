@@ -1,6 +1,14 @@
 const { wcGet, reviewsSelected } = require('../util/functions');
 
 module.exports = {
+  coupons: async (root, args, context, info) => {
+    let coupons = await wcGet('coupons');
+    return coupons;
+  },
+  customers: async (root, args, context, info) => {
+    let customers = await wcGet('customers');
+    return customers;
+  },
   products: async (root, args, context, info) => {
     let products = await wcGet('products');
     if(reviewsSelected(info)){
