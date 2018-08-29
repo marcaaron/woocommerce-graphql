@@ -51,7 +51,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({req}:{req:{headers: {authorization: string}}}) => {
-    const token = req.headers.authorization || '';
+    const token:string = req.headers.authorization || '';
     let user_id;
     if(token){
       user_id = getUser(token);

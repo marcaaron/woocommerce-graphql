@@ -22,21 +22,33 @@ const wcPost = async (endpoint:string, data:any) => {
   return JSON.parse(payload.toJSON().body);
 }
 
-const reviewsSelected = (info:any): boolean => {
+type Info = {
+  fieldNodes:[{
+    selectionSet:{
+      selections:[{
+        name: {
+          value: string
+        }
+      }]
+    }
+  }]
+};
+
+const reviewsSelected = (info:Info): boolean => {
   const selections = info.fieldNodes[0].selectionSet.selections
-  .filter((selection:any) => selection.name.value === 'reviews');
+  .filter((selection:{name: {value: string}}) => selection.name.value === 'reviews');
   return selections.length > 0;
 }
 
 const validate = async (token: string) => {
-  const result = await fetch(`${process.env.WOOCOMMERCE_ENDPOINT}/wp-json/jwt-auth/v1/token/validate`, {
+  const result:number = await fetch(`${process.env.WOOCOMMERCE_ENDPOINT}/wp-json/jwt-auth/v1/token/validate`, {
     method: 'post',
     headers: {
       'Authorization': token
     }
   })
   .then((res:any) => res.json())
-  .then((json:any) => json.data.status);
+  .then((json:{data:{status:number}}) => json.data.status);
   return result !== 200 ? false : true;
 }
 
