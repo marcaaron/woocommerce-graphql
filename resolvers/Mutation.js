@@ -1,9 +1,11 @@
 const { wcPost, reviewsSelected, validate } = require('../util/functions');
+const { pubsub } = require('../pubsub');
 
 module.exports = {
   createPaidOrder: async (root, { order }, context, info) => {
     try {
       const placedOrder = await wcPost(`orders`, order);
+      pubsub.publish(actions.ORDER_PLACED, { orderPlaced: order });
       return placedOrder;
     }catch(e){
       console.log(e);

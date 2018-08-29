@@ -2,8 +2,13 @@ const { ApolloServer, gql } = require('apollo-server');
 const { ProductTypes, OrderTypes, OrderInputTypes, CouponType, CustomerType } = require('./Types');
 const { Mutation, Query } = require('./resolvers');
 const { getUser } = require('./util/functions');
+const { pubsub, actions } = require('./pubsub');
 
 const typeDefs = gql`
+  type Subscription {
+    orderPlaced: Order
+  }
+
   type Query {
     products: [Product]
     customers: [Customer]
@@ -12,7 +17,7 @@ const typeDefs = gql`
     productsByTag(tag: String): [Product]
     reviewsByProductId(product_id: Int): [Review]
     coupons: [Coupon]
-    logIn(user:UserInput): User
+    login(user:UserInput): User
     currentCustomer: Customer
   }
 
@@ -42,7 +47,12 @@ const typeDefs = gql`
 
 const resolvers = {
   Mutation,
-  Query
+  Query,
+  Subscription: {
+    orderPlaced: {
+      subscribe: () => pubsub.asyncIterator([actions.ORDER_PLACED]),
+    },
+  }
 };
 
 const server = new ApolloServer({
