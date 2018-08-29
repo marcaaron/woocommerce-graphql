@@ -1,3 +1,4 @@
+export {};
 const { ApolloServer, gql } = require('apollo-server');
 const { ProductTypes, OrderTypes, OrderInputTypes, CouponType, CustomerType } = require('./Types');
 const { Mutation, Query } = require('./resolvers');
@@ -12,7 +13,8 @@ const typeDefs = gql`
     productsByTag(tag: String): [Product]
     reviewsByProductId(product_id: Int): [Review]
     coupons: [Coupon]
-    logIn(user:UserInput): User
+    login(user:UserInput): User
+    signup(user:UserInput): User
     currentCustomer: Customer
   }
 
@@ -48,13 +50,16 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({req}) => {
+  context: ({req}:{req:{headers: {authorization: string}}}) => {
     const token = req.headers.authorization || '';
-    const user_id = getUser(token);
+    let user_id;
+    if(token){
+      user_id = getUser(token);
+    }
     return { token, user_id };
   }
 });
 
-server.listen().then(({ url }) => {
+server.listen().then(({url}:{url:string}) => {
   console.log(`🚀  Server ready at ${url}`);
 });

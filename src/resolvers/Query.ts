@@ -1,20 +1,21 @@
+export {};
 const { wcGet, reviewsSelected } = require('../util/functions');
 require('dotenv').config()
-const axios = require('axios');
+const fetch = require('node-fetch');
 
 module.exports = {
-  coupons: async (root, args, context, info) => {
+  coupons: async ( ) => {
     let coupons = await wcGet('coupons');
     return coupons;
   },
-  customers: async (root, args, context, info) => {
+  customers: async (root:any, args:any, context:any, info:any) => {
     let customers = await wcGet('customers');
     return customers;
   },
-  products: async (root, args, context, info) => {
+  products: async (root:any, args:any, context:any, info:any) => {
     let products = await wcGet('products');
     if(reviewsSelected(info)){
-      products = products.map( async (product) => {
+      products = products.map( async (product:any) => {
         const reviews = await wcGet(`products/${product.id}/reviews`)
         product.reviews = reviews;
         return product;
@@ -22,7 +23,7 @@ module.exports = {
     }
     return products;
   },
-  productById: async (root, {id}, context, info) => {
+  productById: async (root:any, {id}:{id:number}, context:any, info:any) => {
     let product = await wcGet(`products/${id}`);
     if(reviewsSelected(info)){
       const reviews = await wcGet(`products/${product.id}/reviews`)
@@ -31,7 +32,7 @@ module.exports = {
     }
     return product;
   },
-  productBySlug: async (root, {slug}, context, info) => {
+  productBySlug: async (root:any, {slug}:{slug:string}, context:any, info:any) => {
     let product = await wcGet(`products/?&slug=${slug}`);
     product = product[0];
     if(reviewsSelected(info)){
@@ -41,24 +42,29 @@ module.exports = {
     }
     return product;
   },
-  reviewsByProductId: async (root, {product_id}, context, info) => {
+  reviewsByProductId: async (root:any, {product_id}:{product_id:string}, context:any, info:any) => {
     const productReviews = await wcGet(`products/${product_id}/reviews`);
     return productReviews;
   },
-  productsByTag: async (root, {tag}, context, info) => {
+  productsByTag: async (root:any, {tag}:{tag:string}) => {
     // Tag = Tag ID as a String value! Not Tag Name!
     const products = await wcGet(`products/?&tag=${tag}`);
     return products;
   },
-  logIn: async (root, {user}, context, info) => {
-    let userLogin = await axios.post(
+  login: async (root:any, {user}:{user:any}) => {
+    const userLogin = await fetch(
       `${process.env.WOOCOMMERCE_ENDPOINT}/wp-json/jwt-auth/v1/token`,
-      user
-    );
-    const { data } = userLogin;
-    return data;
+      {
+        method: 'post',
+        body: JSON.stringify(user),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    .then((res:any)=>res.json())
+    .then((json:any)=>json);
+    return userLogin;
   },
-  currentCustomer: async (root, args, {user_id}, info) => {
+  currentCustomer: async (root:any, args:any, {user_id}:{user_id:number}) => {
     let user = await wcGet(`customers/${user_id}`);
     return user;
   }

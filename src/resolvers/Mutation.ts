@@ -1,7 +1,7 @@
 const { wcPost, reviewsSelected, validate } = require('../util/functions');
 
 module.exports = {
-  createPaidOrder: async (root, { order }, context, info) => {
+  createPaidOrder: async (_:Object, { order }:{order:string}) => {
     try {
       const placedOrder = await wcPost(`orders`, order);
       return placedOrder;
@@ -10,7 +10,7 @@ module.exports = {
       return e;
     }
   },
-  createNewCustomer: async (root, { customer }, context, info) => {
+  createNewCustomer: async (_:Object, {customer}:{customer:Object}) => {
     try {
       const newCustomer = await wcPost(`customers`, customer);
       return newCustomer;
@@ -19,7 +19,7 @@ module.exports = {
       return e;
     }
   },
-  cancelCustomerOrder: async (root, args, { token }, info) => {
+  cancelCustomerOrder: async (_:Object, _args:null, {token}:{token:string}) => {
     const validToken = await validate(token);
     return validToken;
   }
