@@ -20,6 +20,12 @@ const wcPost = async (endpoint, data) => {
   return JSON.parse(payload.toJSON().body);
 }
 
+function reviewsSelected(info){
+  const selections = info.fieldNodes[0].selectionSet.selections
+  .filter(selection=>selection.name.value === 'reviews');
+  return selections.length > 0;
+}
+
 module.exports = {
-  wcGet, wcPost
+  wcGet, wcPost, reviewsSelected
 }
