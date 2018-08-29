@@ -1,4 +1,6 @@
 const { wcGet, reviewsSelected } = require('../util/functions');
+require('dotenv').config()
+const axios = require('axios');
 
 module.exports = {
   coupons: async (root, args, context, info) => {
@@ -47,5 +49,17 @@ module.exports = {
     // Tag = Tag ID as a String value! Not Tag Name!
     const products = await wcGet(`products/?&tag=${tag}`);
     return products;
+  },
+  logIn: async (root, {user}, context, info) => {
+    let userLogin = await axios.post(
+      `${process.env.WOOCOMMERCE_ENDPOINT}/wp-json/jwt-auth/v1/token`,
+      user
+    );
+    const { data } = userLogin;
+    return data;
+  },
+  currentCustomer: async (root, args, {user_id}, info) => {
+    let user = await wcGet(`customers/${user_id}`);
+    return user;
   }
 }
