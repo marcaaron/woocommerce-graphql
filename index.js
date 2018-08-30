@@ -19,6 +19,7 @@ const typeDefs = gql`
     coupons: [Coupon]
     login(user:UserInput): User
     currentCustomer: Customer
+    currentCustomerOrders: [Order]
   }
 
   input UserInput {

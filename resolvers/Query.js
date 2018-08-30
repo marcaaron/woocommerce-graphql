@@ -64,6 +64,14 @@ module.exports = {
   },
   currentCustomer: async (root, args, {user_id}, info) => {
     let user = await wcGet(`customers/${user_id}`);
-    return user;
+    if(user.id){
+      return user;
+    }else{
+      return null;
+    }
+  },
+  currentCustomerOrders: async (root, args, {user_id}, info) => {
+    const orders = await wcGet(`orders/?&customer=${user_id}`);
+    return orders;
   }
 }
